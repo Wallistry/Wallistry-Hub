@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wallistry Hub</title>
+  <style>
+    /* CONFIGURATION */
+    :root {
+      --bg-color: #3b6ce6;
+      --bg-image: url('background.jpg');
+      --redirect-url: https://your-redirect-url.com;
+      --link-bio: https://your-bio-site.com;
+      --link-discord: https://discord.gg/your-server;
+      --link-tiktok: https://tiktok.com/@your-account;
+      --menu-width: 220px;
+      --menu-gap: 20px;
+      --link-height: 200px;   /* Unified height */
+      --logo-src: 'wallistry-logo.png';
+      --logo-height: 300px;
+      --icon-size: 48px;       /* Menu icon size */
+      --btn-background: rgba(255,255,255,0.3);
+      --btn-radius: 50%;
+      --btn-size: 60px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-image) center/cover no-repeat, var(--bg-color);
+      font-family: sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Hamburger button container */
+    #menuBtn {
+      position: relative;
+      width: var(--btn-size);
+      height: var(--btn-size);
+      cursor: pointer;
+      z-index: 20; /* above sideMenu */
+      margin-left: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    /* Circle background behind the bars */
+    #menuBtn::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: var(--btn-size);
+      height: var(--btn-size);
+      background: var(--btn-background);
+      border-radius: var(--btn-radius);
+      z-index: -1;
+    }
+    .bar { width: 60%; height: 4px; background: #fff; margin: 4px 0; }
+
+    /* Side menu panel */
+    #sideMenu {
+      position: absolute;
+      top: 20px;
+      left: calc(5% - var(--menu-width) - var(--menu-gap));
+      width: var(--menu-width);
+      height: var(--link-height);
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      transition: left 0.3s ease, opacity 0.3s ease;
+      z-index: 16; /* above header */
+      opacity: 0;
+      pointer-events: none;
+    }
+    #sideMenu.show { opacity: 1; pointer-events: auto; }
+    body.menu-open #sideMenu { left: 5%; }
+
+    /* Menu links */
+    #sideMenu a {
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      height: calc(var(--link-height) / 1.5);
+      padding: 0 16px;
+      font-size: 1rem;
+      width: 100%;
+    }
+    #sideMenu a img {
+      flex-shrink: 0;
+      width: var(--icon-size);
+      height: var(--icon-size);
+      object-fit: contain;
+      margin-right: 12px;
+      padding-right: 12px;
+      border-right: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* Header block */
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: var(--link-height);
+      width: 90%;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      transition: width 0.3s ease, transform 0.3s ease;
+      z-index: 15; /* above sideMenu */
+    }
+    body.menu-open .header {
+      width: calc(90% - var(--menu-width) - var(--menu-gap));
+      transform: translateX(calc(-50% + (var(--menu-width) + var(--menu-gap)) / 2));
+    }
+    .header .title {
+      margin: 0 auto;
+      user-select: none;
+    }
+    .header .title img {
+      height: var(--logo-height);
+      width: auto;
+    }
+
+    /* Code entry modal */
+    .modal {
+      position: absolute;
+      top: calc(var(--link-height) + 100px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      display: none;
+      color: #fff;
+    }
+    .modal.active { display: block; }
+    .modal h2 { margin-bottom: 15px; }
+    .error { color: #e00; margin-bottom: 15px; display: none; }
+    .input-group {
+      display: flex;
+      border: 3px solid #000;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .input-group input,
+    .input-group button {
+      flex: 1;
+      border: none;
+      padding: 15px;
+      background: transparent;
+      color: #fff;
+      font-size: 1rem;
+    }
+    .btn-primary { background: rgba(0,0,0,0.2); cursor: pointer; }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+      const menuBtn = document.getElementById('menuBtn');
+      const sideMenu = document.getElementById('sideMenu');
+      const logoImg = document.getElementById('logoImg');
+      let menuOpen = false;
+
+      const rawLogo = getComputedStyle(document.documentElement).getPropertyValue('--logo-src').trim();
+      logoImg.src = rawLogo.replace(/['"\\]/g, '');
+
+      const header = document.querySelector('.header');
+      function positionSideMenu() {
+        const rect = header.getBoundingClientRect();
+        sideMenu.style.top = rect.top + 'px';
+        const gap = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--menu-gap'));
+        const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--menu-width'));
+        const baseLeft = rect.left - width - gap;
+        sideMenu.style.left = menuOpen ? rect.left + 'px' : baseLeft + 'px';
+      }
+
+      window.addEventListener('load', positionSideMenu);
+      window.addEventListener('resize', positionSideMenu);
+
+      menuBtn.addEventListener('click', () => {
+        menuOpen = !menuOpen;
+        body.classList.toggle('menu-open', menuOpen);
+        sideMenu.classList.toggle('show', menuOpen);
+        positionSideMenu();
+      });
+
+      ['linkBio','linkDiscord','linkTiktok'].forEach(id => {
+        document.getElementById(id).href = getComputedStyle(document.documentElement)
+          .getPropertyValue(`--link-${id.replace('link','').toLowerCase()}`)
+          .trim();
+      });
+
+      document.getElementById('submitBtn').addEventListener('click', () => {
+        const input = document.getElementById('codeInput');
+        const err = document.getElementById('errorMain');
+        const val = input.value.trim();
+        const codes = [{code:'ABC123',uses:1},{code:'XYZ999',uses:-1}];
+        const entry = codes.find(c => c.code === val);
+        if (!entry || entry.uses === 0) { err.style.display = 'block'; return; }
+        window.location.href = getComputedStyle(document.documentElement).getPropertyValue('--redirect-url').trim();
+      });
+    });
+  </script>
+</head>
+<body>
+  <img id="bgSrc" src="background.jpg" style="display:none">
+  <div id="sideMenu">
+    <a href="#" id="linkBio"><img src="bio-icon.png" alt="bio">BIO SITE</a>
+    <a href="#" id="linkDiscord"><img src="discord-icon.png" alt="discord">DISCORD</a>
+    <a href="#" id="linkTiktok"><img src="tiktok-icon.png" alt="tiktok">TIKTOK</a>
+  </div>
+  <div class="header">
+    <div id="menuBtn"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    <div class="title"><img id="logoImg" alt="Wallistry Hub Logo"></div>
+  </div>
+  <div class="modal active" id="mainModal">
+    <h2>ENTER YOUR PRODUCT CODE</h2>
+    <p id="errorMain" class="error">Code invalid or already used</p>
+    <div class="input-group">
+      <input id="codeInput" placeholder="ENTER CODE HERE">
+      <button id="submitBtn" class="btn-primary" type="button">SUBMIT</button>
+    </div>
+  </div>
+</body>
+</html>
+
+
+
