@@ -15,10 +15,9 @@
       --link-tiktok: https://www.tiktok.com/@wallistry;
       --menu-width: 220px;
       --menu-gap: 20px;
-      --link-height: 200px;   /* Unified height */
-      --logo-src: 'wallistry-logo.png';
+      --link-height: 200px;
       --logo-height: 300px;
-      --icon-size: 48px;       /* Menu icon size */
+      --icon-size: 48px;
       --btn-background: rgba(255,255,255,0.3);
       --btn-radius: 50%;
       --btn-size: 60px;
@@ -33,20 +32,64 @@
       position: relative;
     }
 
-    /* Hamburger button container */
+    /* Header block */
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: var(--link-height);
+      width: 90%;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      transition: width 0.3s ease, transform 0.3s ease;
+      z-index: 15;
+    }
+    body.menu-open .header {
+      width: calc(90% - var(--menu-width) - var(--menu-gap));
+      transform: translateX(calc(-50% + (var(--menu-width) + var(--menu-gap)) / 2));
+    }
+    .header .title {
+      margin: 0 auto;
+      user-select: none;
+    }
+    .header .title img {
+      height: var(--logo-height);
+      width: auto;
+    }
+
+    /* Notice box */
+    .notice {
+      position: absolute;
+      top: calc(20px + var(--link-height) + var(--menu-gap));
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 10px 20px;
+      color: #fff;
+      font-size: 1rem;
+      z-index: 14;
+    }
+
+    /* Hamburger button */
     #menuBtn {
-      position: relative;
+      position: absolute;
+      top: 20px;
+      left: 20px;
       width: var(--btn-size);
       height: var(--btn-size);
       cursor: pointer;
-      z-index: 20; /* above sideMenu */
-      margin-left: 20px;
+      z-index: 20;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
     }
-    /* Circle background behind the bars */
     #menuBtn::before {
       content: '';
       position: absolute;
@@ -75,7 +118,7 @@
       align-items: center;
       justify-content: space-around;
       transition: left 0.3s ease, opacity 0.3s ease;
-      z-index: 16; /* above header */
+      z-index: 16;
       opacity: 0;
       pointer-events: none;
     }
@@ -95,7 +138,6 @@
       width: 100%;
     }
     #sideMenu a img {
-      flex-shrink: 0;
       width: var(--icon-size);
       height: var(--icon-size);
       object-fit: contain;
@@ -104,39 +146,10 @@
       border-right: 1px solid rgba(255,255,255,0.5);
     }
 
-    /* Header block */
-    .header {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      height: var(--link-height);
-      width: 90%;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      transition: width 0.3s ease, transform 0.3s ease;
-      z-index: 15; /* above sideMenu */
-    }
-    body.menu-open .header {
-      width: calc(90% - var(--menu-width) - var(--menu-gap));
-      transform: translateX(calc(-50% + (var(--menu-width) + var(--menu-gap)) / 2));
-    }
-    .header .title {
-      margin: 0 auto;
-      user-select: none;
-    }
-    .header .title img {
-      height: var(--logo-height);
-      width: auto;
-    }
-
     /* Code entry modal */
     .modal {
       position: absolute;
-      top: calc(var(--link-height) + 100px);
+      top: calc(var(--link-height) + 140px);
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255,255,255,0.2);
@@ -148,6 +161,7 @@
       width: 90%;
       display: none;
       color: #fff;
+      z-index: 13;
     }
     .modal.active { display: block; }
     .modal h2 { margin-bottom: 15px; }
@@ -175,11 +189,11 @@
       const body = document.body;
       const menuBtn = document.getElementById('menuBtn');
       const sideMenu = document.getElementById('sideMenu');
-      const logoImg = document.getElementById('logoImg');
       let menuOpen = false;
 
-      const rawLogo = getComputedStyle(document.documentElement).getPropertyValue('--logo-src').trim();
-      logoImg.src = rawLogo.replace(/['"\\]/g, '');
+      // Single-use code tracking via localStorage
+      const codes = [{code:'ABC123'},{code:'XYZ999'}];
+      const used = JSON.parse(localStorage.getItem('usedCodes') || '[]');
 
       const header = document.querySelector('.header');
       function positionSideMenu() {
@@ -201,8 +215,15 @@
         positionSideMenu();
       });
 
+      // Desktop notice
+      const notice = document.createElement('div');
+      notice.className = 'notice';
+      notice.textContent = 'Switch to desktop site for best view';
+      document.body.appendChild(notice);
+
       ['linkBio','linkDiscord','linkTiktok'].forEach(id => {
-        document.getElementById(id).href = getComputedStyle(document.documentElement)
+        const el = document.getElementById(id);
+        if(el) el.href = getComputedStyle(document.documentElement)
           .getPropertyValue(`--link-${id.replace('link','').toLowerCase()}`)
           .trim();
       });
@@ -211,9 +232,11 @@
         const input = document.getElementById('codeInput');
         const err = document.getElementById('errorMain');
         const val = input.value.trim();
-        const codes = [{code:'ABC123',uses:1},{code:'XYZ999',uses:-1}];
-        const entry = codes.find(c => c.code === val);
-        if (!entry || entry.uses === 0) { err.style.display = 'block'; return; }
+        if(!codes.find(c=>c.code===val) || used.includes(val)){
+          err.style.display='block'; return;
+        }
+        used.push(val);
+        localStorage.setItem('usedCodes', JSON.stringify(used));
         window.location.href = getComputedStyle(document.documentElement).getPropertyValue('--redirect-url').trim();
       });
     });
@@ -228,7 +251,7 @@
   </div>
   <div class="header">
     <div id="menuBtn"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
-    <div class="title"><img id="logoImg" alt="Wallistry Hub Logo"></div>
+    <div class="title"><img id="logoImg" src="wallistry-logo.png" alt="Wallistry Hub Logo"></div>
   </div>
   <div class="modal active" id="mainModal">
     <h2>ENTER YOUR PRODUCT CODE</h2>
@@ -240,7 +263,5 @@
   </div>
 </body>
 </html>
-
-
 
 
