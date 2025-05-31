@@ -73,6 +73,12 @@
       border-radius: var(--btn-radius);
       z-index: -1;
     }
+
+    /* Prevent the logo image from being clickable */
+    #logoImg {
+      pointer-events: none;
+    }
+
     .bar {
       width: 60%;
       height: 4px;
@@ -306,11 +312,12 @@
       animation: pulse 0.6s ease-in-out;
     }
 
-    /* News section starts hidden above without transition */
+    /* News section starts hidden off-screen */
     .news-section {
       position: absolute;
       left: 50%;
-      transform: translateX(-50%) translateY(-20px);
+      top: -9999px; /* off-screen */
+      transform: translateX(-50%);
       opacity: 0;
       width: 95%;
       max-width: 550px;
@@ -338,7 +345,7 @@
 
     /* Reveal news with slide & fade */
     body.news-open .news-section {
-      transform: translateX(-50%) translateY(0);
+      /* `top` set by JS */
       opacity: 1;
       transition: transform var(--anim-duration) ease-out,
                   opacity var(--anim-duration) ease-out;
@@ -470,7 +477,7 @@
           const rect = modalEl.getBoundingClientRect();
           newsSection.style.top = rect.top + rect.height + 20 + 'px';
         } else {
-          // Remove inline top so layout returns to default
+          // remove inline top and hide again
           newsSection.style.top = '';
         }
       });
@@ -529,6 +536,8 @@
   </div>
 </body>
 </html>
+
+
 
 
 
