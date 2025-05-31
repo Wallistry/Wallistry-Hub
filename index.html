@@ -5,86 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wallistry Hub</title>
   <style>
-    /* CONFIGURATION */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+    /* Pulse animation for toggle button */
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
     :root {
       --bg-color: #3b6ce6;
       --bg-image: url('background.jpg');
-      --redirect-url: https://your-redirect-url.com;
       --link-bio: https://bio.site/Wallistry;
       --link-discord: https://discord.gg/szk2bceM6f;
       --link-tiktok: https://www.tiktok.com/@wallistry;
       --menu-width: 220px;
       --menu-gap: 20px;
       --link-height: 200px;
+      --logo-src: 'wallistry-logo.png';
       --logo-height: 300px;
       --icon-size: 48px;
       --btn-background: rgba(255,255,255,0.3);
       --btn-radius: 50%;
       --btn-size: 60px;
+      --anim-duration: 0.3s;
+      --spinner-size: 16px;
+      --spinner-border: 2px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
       background: var(--bg-image) center/cover no-repeat, var(--bg-color);
-      font-family: sans-serif;
-      height: 100vh;
-      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      min-height: 100vh;
+      overflow: visible;
       position: relative;
     }
 
-    /* Header block */
-    .header {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      height: var(--link-height);
-      width: 90%;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      transition: width 0.3s ease, transform 0.3s ease;
-      z-index: 15;
-    }
-    body.menu-open .header {
-      width: calc(90% - var(--menu-width) - var(--menu-gap));
-      transform: translateX(calc(-50% + (var(--menu-width) + var(--menu-gap)) / 2));
-    }
-    .header .title {
-      margin: 0 auto;
-      user-select: none;
-    }
-    .header .title img {
-      height: var(--logo-height);
-      width: auto;
-    }
-
-    /* Notice box */
-    .notice {
-      position: absolute;
-      top: calc(20px + var(--link-height) + var(--menu-gap));
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 10px 20px;
-      color: #fff;
-      font-size: 1rem;
-      z-index: 14;
-    }
-
-    /* Hamburger button */
+    /* Hamburger button container */
     #menuBtn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
+      position: relative;
       width: var(--btn-size);
       height: var(--btn-size);
       cursor: pointer;
       z-index: 20;
+      margin-left: 20px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -93,7 +64,8 @@
     #menuBtn::before {
       content: '';
       position: absolute;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
       width: var(--btn-size);
       height: var(--btn-size);
@@ -101,7 +73,12 @@
       border-radius: var(--btn-radius);
       z-index: -1;
     }
-    .bar { width: 60%; height: 4px; background: #fff; margin: 4px 0; }
+    .bar {
+      width: 60%;
+      height: 4px;
+      background: #fff;
+      margin: 4px 0;
+    }
 
     /* Side menu panel */
     #sideMenu {
@@ -117,13 +94,18 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-around;
-      transition: left 0.3s ease, opacity 0.3s ease;
+      transition: left var(--anim-duration) ease, opacity var(--anim-duration) ease;
       z-index: 16;
       opacity: 0;
       pointer-events: none;
     }
-    #sideMenu.show { opacity: 1; pointer-events: auto; }
-    body.menu-open #sideMenu { left: 5%; }
+    #sideMenu.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    body.menu-open #sideMenu {
+      left: 5%;
+    }
 
     /* Menu links */
     #sideMenu a {
@@ -138,6 +120,7 @@
       width: 100%;
     }
     #sideMenu a img {
+      flex-shrink: 0;
       width: var(--icon-size);
       height: var(--icon-size);
       object-fit: contain;
@@ -146,65 +129,254 @@
       border-right: 1px solid rgba(255,255,255,0.5);
     }
 
+    /* Header block */
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: var(--link-height);
+      width: 90%;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      transition: width var(--anim-duration) ease, transform var(--anim-duration) ease;
+      z-index: 15;
+    }
+    body.menu-open .header {
+      width: calc(90% - var(--menu-width) - var(--menu-gap));
+      transform: translateX(calc(-50% + (var(--menu-width) + var(--menu-gap)) / 2));
+    }
+    .header .title {
+      margin: 0 auto;
+      user-select: none;
+    }
+    .header .title img {
+      height: var(--logo-height);
+      width: auto;
+    }
+
+    /* Mobile notice pane */
+    #mobileNotice {
+      position: absolute;
+      top: calc(var(--link-height) + 40px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 95%;
+      max-width: 550px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      z-index: 30;
+    }
+    #mobileNotice .icon-wrapper {
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #mobileNotice .icon-wrapper img {
+      width: 24px;
+      height: 24px;
+    }
+    #mobileNotice span {
+      color: #fff;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
     /* Code entry modal */
     .modal {
       position: absolute;
-      top: calc(var(--link-height) + 140px);
+      top: calc(var(--link-height) + 120px);
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(10px);
       border-radius: 20px;
-      padding: 40px;
+      padding: 40px 20px 40px;
       text-align: center;
-      max-width: 400px;
-      width: 90%;
-      display: none;
+      max-width: 550px;
+      width: 95%;
       color: #fff;
-      z-index: 13;
+      z-index: 17;
     }
-    .modal.active { display: block; }
-    .modal h2 { margin-bottom: 15px; }
-    .error { color: #e00; margin-bottom: 15px; display: none; }
+    .modal h2 {
+      margin-bottom: 15px;
+    }
+    .error {
+      color: #e00;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    /* Input group */
     .input-group {
       display: flex;
       border: 3px solid #000;
       border-radius: 20px;
       overflow: hidden;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
+      width: 100%;
     }
-    .input-group input,
-    .input-group button {
-      flex: 1;
+    .input-group input {
+      flex: 5;
       border: none;
       padding: 15px;
       background: transparent;
       color: #fff;
       font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
     }
-    .btn-primary { background: rgba(0,0,0,0.2); cursor: pointer; }
+    .input-group button {
+      flex: 1;
+      border: none;
+      padding: 15px 20px;
+      background: rgba(0,0,0,0.2);
+      color: #fff;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: visible;
+    }
+
+    /* Spinner in button */
+    .btn-spinner {
+      display: none;
+      width: var(--spinner-size);
+      height: var(--spinner-size);
+      margin-left: 4px;
+      border: var(--spinner-border) solid rgba(255,255,255,0.5);
+      border-top: var(--spinner-border) solid #fff;
+      border-radius: 50%;
+      animation: spin var(--anim-duration) linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Toggle news button inside modal */
+    #toggleNews {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      font-size: 0.9rem;
+      margin: 0 auto;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+    #toggleNews .icon-wrapper {
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #toggleNews .icon-wrapper img {
+      width: 20px;
+      height: 20px;
+    }
+    /* Pulse on hover */
+    #toggleNews:hover {
+      animation: pulse 0.6s ease-in-out;
+    }
+
+    /* News section starts hidden above without transition */
+    .news-section {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      opacity: 0;
+      width: 95%;
+      max-width: 550px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      color: #fff;
+      z-index: 17;
+    }
+    .news-section h2 {
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+    .news-card {
+      display: block;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+    .news-card img {
+      width: 100%;
+      display: block;
+    }
+
+    /* Reveal news with slide & fade */
+    body.news-open .news-section {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      transition: transform var(--anim-duration) ease-out,
+                  opacity var(--anim-duration) ease-out;
+    }
+
+    /* Original scroll rules */
+    body.news-open {
+      overflow-y: auto;
+      padding-bottom: 0;
+      background-attachment: fixed;
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const body = document.body;
       const menuBtn = document.getElementById('menuBtn');
       const sideMenu = document.getElementById('sideMenu');
+      const logo = document.getElementById('logoImg');
+      logo.src = getComputedStyle(document.documentElement)
+        .getPropertyValue('--logo-src')
+        .replace(/['"]/g, '')
+        .trim();
       let menuOpen = false;
 
-      // Single-use code tracking via localStorage
-      const codes = [{code:'ABC123'},{code:'XYZ999'}];
-      const used = JSON.parse(localStorage.getItem('usedCodes') || '[]');
-
-      const header = document.querySelector('.header');
       function positionSideMenu() {
+        const header = document.querySelector('.header');
         const rect = header.getBoundingClientRect();
         sideMenu.style.top = rect.top + 'px';
-        const gap = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--menu-gap'));
-        const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--menu-width'));
-        const baseLeft = rect.left - width - gap;
-        sideMenu.style.left = menuOpen ? rect.left + 'px' : baseLeft + 'px';
+        const gap = parseInt(
+          getComputedStyle(document.documentElement).getPropertyValue('--menu-gap')
+        );
+        const width = parseInt(
+          getComputedStyle(document.documentElement).getPropertyValue('--menu-width')
+        );
+        sideMenu.style.left = menuOpen
+          ? rect.left + 'px'
+          : rect.left - width - gap + 'px';
       }
-
       window.addEventListener('load', positionSideMenu);
       window.addEventListener('resize', positionSideMenu);
 
@@ -215,53 +387,173 @@
         positionSideMenu();
       });
 
-      // Desktop notice
-      const notice = document.createElement('div');
-      notice.className = 'notice';
-      notice.textContent = 'Switch to desktop site for best view';
-      document.body.appendChild(notice);
-
-      ['linkBio','linkDiscord','linkTiktok'].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.href = getComputedStyle(document.documentElement)
-          .getPropertyValue(`--link-${id.replace('link','').toLowerCase()}`)
-          .trim();
+      ['linkBio', 'linkDiscord', 'linkTiktok'].forEach((id) => {
+        const key = id.replace('link', '').toLowerCase();
+        document.getElementById(id).href =
+          getComputedStyle(document.documentElement).getPropertyValue(`--link-${key}`).trim();
       });
 
-      document.getElementById('submitBtn').addEventListener('click', () => {
-        const input = document.getElementById('codeInput');
-        const err = document.getElementById('errorMain');
-        const val = input.value.trim();
-        if(!codes.find(c=>c.code===val) || used.includes(val)){
-          err.style.display='block'; return;
+      // Tier codes logic
+      const tierConfig = [
+        { codes: 'NEW123, NEW124', uses: 1, redirect: 'https://example.com/newcomer' },
+        { codes: 'COL456', uses: 1, redirect: 'https://example.com/collector' },
+        { codes: 'INS7896', uses: 1, redirect: 'https://example.com/insider' },
+        { codes: 'BOOSTER1', uses: -1, redirect: 'https://example.com/booster' },
+        { codes: 'PROMO1', uses: -1, redirect: 'https://example.com/promo' },
+      ];
+      const entries = tierConfig.flatMap((t) =>
+        t.codes.split(',').map((c) => ({ code: c.trim(), uses: t.uses, redirect: t.redirect }))
+      );
+      const stored = JSON.parse(localStorage.getItem('codeUses') || '{}');
+      entries.forEach((e) => {
+        if (stored[e.code] != null) e.uses = stored[e.code];
+        else stored[e.code] = e.uses;
+      });
+      localStorage.setItem('codeUses', JSON.stringify(stored));
+
+      const input = document.getElementById('codeInput');
+      const err = document.getElementById('errorMain');
+      const submitBtn = document.getElementById('submitBtn');
+      const spinner = document.createElement('div');
+      spinner.className = 'btn-spinner';
+      submitBtn.appendChild(spinner);
+
+      function animateAndCheck() {
+        err.style.display = 'none';
+        input.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'SUBMITTING';
+        submitBtn.appendChild(spinner);
+        spinner.style.display = 'inline-block';
+        const dur =
+          parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue('--anim-duration')
+          ) * 1000;
+        setTimeout(() => {
+          const val = input.value.trim();
+          const e = entries.find((x) => x.code === val);
+          if (e && (e.uses > 0 || e.uses < 0)) {
+            if (e.uses > 0) e.uses--;
+            stored[e.code] = e.uses;
+            localStorage.setItem('codeUses', JSON.stringify(stored));
+            window.location.href = e.redirect;
+          } else {
+            err.style.display = 'block';
+            spinner.style.display = 'none';
+            submitBtn.textContent = 'SUBMIT';
+            input.disabled = false;
+            submitBtn.disabled = false;
+          }
+        }, dur);
+      }
+
+      submitBtn.addEventListener('click', animateAndCheck);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          animateAndCheck();
         }
-        used.push(val);
-        localStorage.setItem('usedCodes', JSON.stringify(used));
-        window.location.href = getComputedStyle(document.documentElement).getPropertyValue('--redirect-url').trim();
+      });
+
+      // Toggle news visibility and position it under modal
+      const toggleBtn = document.getElementById('toggleNews');
+      const newsSection = document.querySelector('.news-section');
+      const modalEl = document.getElementById('mainModal');
+
+      toggleBtn.addEventListener('click', () => {
+        const isOpen = body.classList.toggle('news-open');
+        toggleBtn.querySelector('.btn-text').textContent = isOpen
+          ? "DISMISS WHAT'S NEW!"
+          : "WHAT'S NEW!";
+
+        if (isOpen) {
+          const rect = modalEl.getBoundingClientRect();
+          newsSection.style.top = rect.top + rect.height + 20 + 'px';
+        } else {
+          // Remove inline top so layout returns to default
+          newsSection.style.top = '';
+        }
       });
     });
   </script>
 </head>
 <body>
+  <!-- Mobile notice -->
+  <div id="mobileNotice">
+    <span class="icon-wrapper">
+      <img src="desktop-icon.png" alt="desktop icon">
+    </span>
+    <span>SWITCH TO DESKTOP SITE FOR THE BEST EXPERIENCE</span>
+  </div>
   <img id="bgSrc" src="background.jpg" style="display:none">
+
   <div id="sideMenu">
     <a href="#" id="linkBio"><img src="bio-icon.png" alt="bio">BIO SITE</a>
     <a href="#" id="linkDiscord"><img src="discord-icon.png" alt="discord">DISCORD</a>
     <a href="#" id="linkTiktok"><img src="tiktok-icon.png" alt="tiktok">TIKTOK</a>
   </div>
+
   <div class="header">
-    <div id="menuBtn"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
-    <div class="title"><img id="logoImg" src="wallistry-logo.png" alt="Wallistry Hub Logo"></div>
+    <div id="menuBtn">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <div class="title"><img id="logoImg" alt="Wallistry Hub Logo"></div>
   </div>
+
+  <!-- Product code block with toggle inside -->
   <div class="modal active" id="mainModal">
     <h2>ENTER YOUR PRODUCT CODE</h2>
-    <p id="errorMain" class="error">Code invalid or already used</p>
+    <p id="errorMain" class="error">CODE INVALID OR ALREADY USED</p>
     <div class="input-group">
-      <input id="codeInput" placeholder="ENTER CODE HERE">
+      <input id="codeInput" placeholder="ENTER YOUR CODE HERE">
       <button id="submitBtn" class="btn-primary" type="button">SUBMIT</button>
     </div>
+
+    <!-- Toggle News button inside the same module -->
+    <button id="toggleNews">
+      <span class="icon-wrapper">
+        <img src="megaphone-icon.png" alt="news icon">
+      </span>
+      <span class="btn-text">WHAT'S NEW!</span>
+    </button>
+  </div>
+
+  <!-- News section appears underneath the product code module -->
+  <div class="news-section">
+    <h2>CHECK OUT THE NEW INVINCIBLE WAR (COMIC) WALLPAPER!!!</h2>
+    <a href="YOUR-WALLPAPER-LINK" class="news-card">
+      <img src="invincible-drop0.png" alt="Invincible War Comic">
+    </a>
   </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
