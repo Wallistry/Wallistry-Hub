@@ -44,7 +44,7 @@
       font-family: 'Poppins', sans-serif;
       font-weight: 600;
       min-height: 100vh;
-      overflow: visible;
+      overflow-x: hidden;
       position: relative;
     }
 
@@ -74,7 +74,7 @@
       z-index: -1;
     }
 
-    /* Prevent the logo image from being clickable */
+    /* Prevent the logo from being clickable */
     #logoImg {
       pointer-events: none;
     }
@@ -345,7 +345,7 @@
 
     /* Reveal news with slide & fade */
     body.news-open .news-section {
-      /* `top` set by JS */
+      /* top set by JS */
       opacity: 1;
       transition: transform var(--anim-duration) ease-out,
                   opacity var(--anim-duration) ease-out;
@@ -356,6 +356,63 @@
       overflow-y: auto;
       padding-bottom: 0;
       background-attachment: fixed;
+    }
+
+    /* Responsive adjustments for mobile screens */
+    @media (max-width: 600px) {
+      /* Disable hover animation */
+      #toggleNews:hover {
+        animation: none;
+      }
+
+      /* Header stacks relative */
+      .header {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 100%;
+        margin: 20px auto 0;
+      }
+      .header .title img {
+        height: 150px;
+      }
+
+      /* Mobile notice stacks below header */
+      #mobileNotice {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 90%;
+        margin: 10px auto 0;
+      }
+
+      /* Modal stacks below mobile notice */
+      .modal {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 90%;
+        margin: 10px auto 0;
+      }
+
+      /* News section stacks below modal */
+      .news-section {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 90%;
+        margin: 10px auto 20px;
+      }
+
+      /* Smaller toggle */
+      #toggleNews {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+      }
     }
   </style>
   <script>
@@ -495,7 +552,6 @@
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'SUBMIT';
-        // re-append spinner if necessary
         if (spinner) submitBtn.appendChild(spinner);
       }
       if (input) {
@@ -559,6 +615,8 @@
   </div>
 </body>
 </html>
+
+
 
 
 
