@@ -477,10 +477,33 @@
           const rect = modalEl.getBoundingClientRect();
           newsSection.style.top = rect.top + rect.height + 20 + 'px';
         } else {
-          // remove inline top and hide again
           newsSection.style.top = '';
         }
       });
+    });
+
+    // Reset the "Submitting..." state when returning to this page
+    window.addEventListener('pageshow', () => {
+      const input = document.getElementById('codeInput');
+      const submitBtn = document.getElementById('submitBtn');
+      const spinner = submitBtn.querySelector('.btn-spinner');
+      const err = document.getElementById('errorMain');
+
+      if (spinner) {
+        spinner.style.display = 'none';
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'SUBMIT';
+        // re-append spinner if necessary
+        if (spinner) submitBtn.appendChild(spinner);
+      }
+      if (input) {
+        input.disabled = false;
+      }
+      if (err) {
+        err.style.display = 'none';
+      }
     });
   </script>
 </head>
@@ -536,6 +559,7 @@
   </div>
 </body>
 </html>
+
 
 
 
