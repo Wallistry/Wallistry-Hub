@@ -7,13 +7,6 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
 
-    /* Pulse animation for toggle button */
-    @keyframes pulse {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
     :root {
       --bg-color: #3b6ce6;
       --bg-image: url('background.jpg');
@@ -30,8 +23,7 @@
       --btn-radius: 50%;
       --btn-size: 60px;
       --anim-duration: 0.3s;
-      --spinner-size: 16px;
-      --spinner-border: 2px;
+      --shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
     * {
@@ -44,11 +36,50 @@
       font-family: 'Poppins', sans-serif;
       font-weight: 600;
       min-height: 100vh;
-      overflow-x: hidden;
+      overflow: visible;            /* no scrollbar by default */
       position: relative;
     }
 
-    /* Hamburger button container */
+    .header,
+    #sideMenu,
+    #mobileNotice,
+    .modal,
+    .news-section {
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: var(--link-height);
+      width: 90%;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      transition: width var(--anim-duration) ease,
+                  transform var(--anim-duration) ease;
+      z-index: 15;
+    }
+    body.menu-open .header {
+      width: calc(90% - var(--menu-width) - var(--menu-gap));
+      transform: translateX(calc(
+        -50% + (var(--menu-width) + var(--menu-gap)) / 2
+      ));
+    }
+    .header .title {
+      margin: 0 auto;
+      user-select: none;
+    }
+    .header .title img {
+      height: var(--logo-height);
+      width: auto;
+      transition: height var(--anim-duration) ease;
+    }
+
     #menuBtn {
       position: relative;
       width: var(--btn-size);
@@ -57,36 +88,25 @@
       z-index: 20;
       margin-left: 20px;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      transition: transform 0.6s ease-out;
     }
+    #menuBtn:hover { transform: scale(1.05) }
     #menuBtn::before {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: var(--btn-size);
-      height: var(--btn-size);
+      top:50%; left:50%;
+      transform: translate(-50%,-50%);
+      width: var(--btn-size); height: var(--btn-size);
       background: var(--btn-background);
       border-radius: var(--btn-radius);
       z-index: -1;
     }
-
-    /* Prevent the logo from being clickable */
-    #logoImg {
-      pointer-events: none;
+    #menuBtn img {
+      width: 60%; height: 60%; object-fit: contain;
     }
 
-    .bar {
-      width: 60%;
-      height: 4px;
-      background: #fff;
-      margin: 4px 0;
-    }
-
-    /* Side menu panel */
     #sideMenu {
       position: absolute;
       top: 20px;
@@ -109,11 +129,7 @@
       opacity: 1;
       pointer-events: auto;
     }
-    body.menu-open #sideMenu {
-      left: 5%;
-    }
-
-    /* Menu links */
+    body.menu-open #sideMenu { left: 5% }
     #sideMenu a {
       color: #fff;
       text-decoration: none;
@@ -122,49 +138,16 @@
       justify-content: flex-start;
       height: calc(var(--link-height) / 1.5);
       padding: 0 16px;
-      font-size: 1rem;
+      font-size: calc(1rem + 0.2vw);
       width: 100%;
     }
     #sideMenu a img {
-      flex-shrink: 0;
-      width: var(--icon-size);
-      height: var(--icon-size);
-      object-fit: contain;
+      width: calc(var(--icon-size) * 0.75);
+      height: auto;
       margin-right: 12px;
-      padding-right: 12px;
-      border-right: 1px solid rgba(255,255,255,0.5);
+      object-fit: contain;
     }
 
-    /* Header block */
-    .header {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      height: var(--link-height);
-      width: 90%;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      transition: width var(--anim-duration) ease, transform var(--anim-duration) ease;
-      z-index: 15;
-    }
-    body.menu-open .header {
-      width: calc(90% - var(--menu-width) - var(--menu-gap));
-      transform: translateX(calc(-50% + (var(--menu-width) + var(--menu-gap)) / 2));
-    }
-    .header .title {
-      margin: 0 auto;
-      user-select: none;
-    }
-    .header .title img {
-      height: var(--logo-height);
-      width: auto;
-    }
-
-    /* Mobile notice pane */
     #mobileNotice {
       position: absolute;
       top: calc(var(--link-height) + 40px);
@@ -192,8 +175,7 @@
       justify-content: center;
     }
     #mobileNotice .icon-wrapper img {
-      width: 24px;
-      height: 24px;
+      width: 24px; height: 24px;
     }
     #mobileNotice span {
       color: #fff;
@@ -201,7 +183,6 @@
       white-space: nowrap;
     }
 
-    /* Code entry modal */
     .modal {
       position: absolute;
       top: calc(var(--link-height) + 120px);
@@ -210,23 +191,15 @@
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(10px);
       border-radius: 20px;
-      padding: 40px 20px 40px;
+      padding: 40px 20px;
       text-align: center;
       max-width: 550px;
       width: 95%;
       color: #fff;
-      z-index: 17;
+      z-index: 18;
     }
-    .modal h2 {
-      margin-bottom: 15px;
-    }
-    .error {
-      color: #e00;
-      margin-bottom: 15px;
-      display: none;
-    }
+    .modal h2 { margin-bottom: 15px }
 
-    /* Input group */
     .input-group {
       display: flex;
       border: 3px solid #000;
@@ -258,27 +231,8 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      overflow: visible;
     }
 
-    /* Spinner in button */
-    .btn-spinner {
-      display: none;
-      width: var(--spinner-size);
-      height: var(--spinner-size);
-      margin-left: 4px;
-      border: var(--spinner-border) solid rgba(255,255,255,0.5);
-      border-top: var(--spinner-border) solid #fff;
-      border-radius: 50%;
-      animation: spin var(--anim-duration) linear infinite;
-    }
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* Toggle news button inside modal */
     #toggleNews {
       display: inline-flex;
       align-items: center;
@@ -288,35 +242,17 @@
       border: none;
       border-radius: 30px;
       cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-      color: #fff;
       font-size: 0.9rem;
-      margin: 0 auto;
-      position: relative;
-      transition: transform 0.2s ease;
+      color: #fff;
+      transition: transform 0.6s ease-out;
+      margin-top: 10px;
     }
-    #toggleNews .icon-wrapper {
-      background: rgba(255,255,255,0.3);
-      border-radius: 50%;
-      padding: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #toggleNews .icon-wrapper img {
-      width: 20px;
-      height: 20px;
-    }
-    /* Pulse on hover */
-    #toggleNews:hover {
-      animation: pulse 0.6s ease-in-out;
-    }
+    #toggleNews:hover { transform: scale(1.05) }
 
-    /* News section starts hidden off-screen */
     .news-section {
       position: absolute;
       left: 50%;
-      top: -9999px; /* off-screen */
+      top: -9999px;
       transform: translateX(-50%);
       opacity: 0;
       width: 95%;
@@ -328,122 +264,60 @@
       text-align: center;
       color: #fff;
       z-index: 17;
+      transition: opacity var(--anim-duration) ease, top var(--anim-duration) ease;
     }
-    .news-section h2 {
-      margin-bottom: 15px;
-      font-size: 1rem;
-    }
-    .news-card {
-      display: block;
-      overflow: hidden;
-      border-radius: 15px;
-    }
-    .news-card img {
-      width: 100%;
-      display: block;
-    }
+    .news-section h2 { margin-bottom: 15px; font-size: 1rem }
+    .news-card img { width: 100%; height: auto; display: block }
 
-    /* Reveal news with slide & fade */
     body.news-open .news-section {
-      /* top set by JS */
       opacity: 1;
-      transition: transform var(--anim-duration) ease-out,
-                  opacity var(--anim-duration) ease-out;
+      top: calc(var(--link-height) + 180px);
     }
 
-    /* Original scroll rules */
-    body.news-open {
-      overflow-y: auto;
-      padding-bottom: 0;
-      background-attachment: fixed;
-    }
-
-    /* Responsive adjustments for mobile screens */
     @media (max-width: 600px) {
-      /* Disable hover animation */
-      #toggleNews:hover {
-        animation: none;
+      :root {
+        --menu-width: 140px;
+        --menu-gap: 10px;
+        --link-height: 120px;
+        --logo-height: 160px;
+        --icon-size: 28px;
+        --btn-size: 44px;
       }
-
-      /* Header stacks relative */
-      .header {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        width: 100%;
-        margin: 20px auto 0;
+      body { font-size: 0.85rem }
+      body.menu-open .header .title img {
+        height: 120px;
       }
-      .header .title img {
-        height: 150px;
-      }
-
-      /* Mobile notice stacks below header */
-      #mobileNotice {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        width: 90%;
-        margin: 10px auto 0;
-      }
-
-      /* Modal stacks below mobile notice */
-      .modal {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        width: 90%;
-        margin: 10px auto 0;
-      }
-
-      /* News section stacks below modal */
-      .news-section {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        width: 90%;
-        margin: 10px auto 20px;
-      }
-
-      /* Smaller toggle */
-      #toggleNews {
-        padding: 0.5rem 1rem;
-        font-size: 0.8rem;
-      }
+      #menuBtn { margin-left: 12px }
+      .input-group input { font-size: 0.8rem; padding: 12px }
+      .input-group button { font-size: 0.8rem; padding: 12px 16px }
+      .news-section { max-width: 90% }
     }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const body = document.body;
-      const menuBtn = document.getElementById('menuBtn');
-      const sideMenu = document.getElementById('sideMenu');
-      const logo = document.getElementById('logoImg');
+      const body         = document.body;
+      const menuBtn      = document.getElementById('menuBtn');
+      const sideMenu     = document.getElementById('sideMenu');
+      const toggleNews   = document.getElementById('toggleNews');
+      const newsSection  = document.querySelector('.news-section');
+      const logo         = document.getElementById('logoImg');
       logo.src = getComputedStyle(document.documentElement)
-        .getPropertyValue('--logo-src')
-        .replace(/['"]/g, '')
-        .trim();
-      let menuOpen = false;
+        .getPropertyValue('--logo-src').replace(/['"]/g, '').trim();
 
+      let menuOpen = false;
       function positionSideMenu() {
-        const header = document.querySelector('.header');
-        const rect = header.getBoundingClientRect();
+        const rect = document.querySelector('.header').getBoundingClientRect();
         sideMenu.style.top = rect.top + 'px';
-        const gap = parseInt(
-          getComputedStyle(document.documentElement).getPropertyValue('--menu-gap')
-        );
-        const width = parseInt(
-          getComputedStyle(document.documentElement).getPropertyValue('--menu-width')
-        );
+        const gap   = parseInt(getComputedStyle(document.documentElement)
+                          .getPropertyValue('--menu-gap'));
+        const width = parseInt(getComputedStyle(document.documentElement)
+                          .getPropertyValue('--menu-width'));
         sideMenu.style.left = menuOpen
           ? rect.left + 'px'
           : rect.left - width - gap + 'px';
       }
-      window.addEventListener('load', positionSideMenu);
-      window.addEventListener('resize', positionSideMenu);
-
+      window.addEventListener('load',    positionSideMenu);
+      window.addEventListener('resize',  positionSideMenu);
       menuBtn.addEventListener('click', () => {
         menuOpen = !menuOpen;
         body.classList.toggle('menu-open', menuOpen);
@@ -451,127 +325,44 @@
         positionSideMenu();
       });
 
-      ['linkBio', 'linkDiscord', 'linkTiktok'].forEach((id) => {
-        const key = id.replace('link', '').toLowerCase();
-        document.getElementById(id).href =
-          getComputedStyle(document.documentElement).getPropertyValue(`--link-${key}`).trim();
-      });
-
-      // Tier codes logic
-      const tierConfig = [
-        { codes: 'NEW123, NEW124', uses: 1, redirect: 'https://example.com/newcomer' },
-        { codes: 'COL456', uses: 1, redirect: 'https://example.com/collector' },
-        { codes: 'INS7896', uses: 1, redirect: 'https://example.com/insider' },
-        { codes: 'BOOSTER1', uses: -1, redirect: 'https://example.com/booster' },
-        { codes: 'PROMO1', uses: -1, redirect: 'https://example.com/promo' },
-      ];
-      const entries = tierConfig.flatMap((t) =>
-        t.codes.split(',').map((c) => ({ code: c.trim(), uses: t.uses, redirect: t.redirect }))
-      );
-      const stored = JSON.parse(localStorage.getItem('codeUses') || '{}');
-      entries.forEach((e) => {
-        if (stored[e.code] != null) e.uses = stored[e.code];
-        else stored[e.code] = e.uses;
-      });
-      localStorage.setItem('codeUses', JSON.stringify(stored));
-
-      const input = document.getElementById('codeInput');
-      const err = document.getElementById('errorMain');
-      const submitBtn = document.getElementById('submitBtn');
-      const spinner = document.createElement('div');
-      spinner.className = 'btn-spinner';
-      submitBtn.appendChild(spinner);
-
-      function animateAndCheck() {
-        err.style.display = 'none';
-        input.disabled = true;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'SUBMITTING';
-        submitBtn.appendChild(spinner);
-        spinner.style.display = 'inline-block';
-        const dur =
-          parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue('--anim-duration')
-          ) * 1000;
-        setTimeout(() => {
-          const val = input.value.trim();
-          const e = entries.find((x) => x.code === val);
-          if (e && (e.uses > 0 || e.uses < 0)) {
-            if (e.uses > 0) e.uses--;
-            stored[e.code] = e.uses;
-            localStorage.setItem('codeUses', JSON.stringify(stored));
-            window.location.href = e.redirect;
-          } else {
-            err.style.display = 'block';
-            spinner.style.display = 'none';
-            submitBtn.textContent = 'SUBMIT';
-            input.disabled = false;
-            submitBtn.disabled = false;
-          }
-        }, dur);
-      }
-
-      submitBtn.addEventListener('click', animateAndCheck);
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          animateAndCheck();
-        }
-      });
-
-      // Toggle news visibility and position it under modal
-      const toggleBtn = document.getElementById('toggleNews');
-      const newsSection = document.querySelector('.news-section');
-      const modalEl = document.getElementById('mainModal');
-
-      toggleBtn.addEventListener('click', () => {
-        const isOpen = body.classList.toggle('news-open');
-        toggleBtn.querySelector('.btn-text').textContent = isOpen
+      toggleNews.addEventListener('click', () => {
+        const open = body.classList.toggle('news-open');
+        toggleNews.querySelector('.btn-text').textContent = open
           ? "DISMISS WHAT'S NEW!"
           : "WHAT'S NEW!";
 
-        if (isOpen) {
-          const rect = modalEl.getBoundingClientRect();
-          newsSection.style.top = rect.top + rect.height + 20 + 'px';
+        if (open) {
+          // enable scrolling & expand page height so you can scroll to the news
+          body.style.overflowY = 'auto';
+          // compute bottom of news-section
+          const rect = newsSection.getBoundingClientRect();
+          const scrollTop = window.scrollY || document.documentElement.scrollTop;
+          // page needs to be at least this tall to reach the news
+          const neededHeight = rect.top + scrollTop + newsSection.offsetHeight + 20;
+          body.style.minHeight = neededHeight + 'px';
         } else {
-          newsSection.style.top = '';
+          // back to original
+          body.style.overflowY = 'visible';
+          body.style.minHeight  = '';
         }
       });
-    });
 
-    // Reset the "Submitting..." state when returning to this page
-    window.addEventListener('pageshow', () => {
-      const input = document.getElementById('codeInput');
-      const submitBtn = document.getElementById('submitBtn');
-      const spinner = submitBtn.querySelector('.btn-spinner');
-      const err = document.getElementById('errorMain');
-
-      if (spinner) {
-        spinner.style.display = 'none';
-      }
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'SUBMIT';
-        if (spinner) submitBtn.appendChild(spinner);
-      }
-      if (input) {
-        input.disabled = false;
-      }
-      if (err) {
-        err.style.display = 'none';
-      }
+      ['linkBio','linkDiscord','linkTiktok'].forEach(id => {
+        const key = id.replace('link','').toLowerCase();
+        document.getElementById(id).href =
+          getComputedStyle(document.documentElement)
+            .getPropertyValue(`--link-${key}`).trim();
+      });
     });
   </script>
 </head>
 <body>
-  <!-- Mobile notice -->
   <div id="mobileNotice">
     <span class="icon-wrapper">
       <img src="desktop-icon.png" alt="desktop icon">
     </span>
     <span>SWITCH TO DESKTOP SITE FOR THE BEST EXPERIENCE</span>
   </div>
-  <img id="bgSrc" src="background.jpg" style="display:none">
 
   <div id="sideMenu">
     <a href="#" id="linkBio"><img src="bio-icon.png" alt="bio">BIO SITE</a>
@@ -581,23 +372,18 @@
 
   <div class="header">
     <div id="menuBtn">
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
+      <img src="hamburger.png" alt="menu">
     </div>
     <div class="title"><img id="logoImg" alt="Wallistry Hub Logo"></div>
   </div>
 
-  <!-- Product code block with toggle inside -->
   <div class="modal active" id="mainModal">
     <h2>ENTER YOUR PRODUCT CODE</h2>
     <p id="errorMain" class="error">CODE INVALID OR ALREADY USED</p>
     <div class="input-group">
       <input id="codeInput" placeholder="ENTER YOUR CODE HERE">
-      <button id="submitBtn" class="btn-primary" type="button">SUBMIT</button>
+      <button id="submitBtn" type="button">SUBMIT</button>
     </div>
-
-    <!-- Toggle News button inside the same module -->
     <button id="toggleNews">
       <span class="icon-wrapper">
         <img src="megaphone-icon.png" alt="news icon">
@@ -606,7 +392,6 @@
     </button>
   </div>
 
-  <!-- News section appears underneath the product code module -->
   <div class="news-section">
     <h2>CHECK OUT THE NEW INVINCIBLE WAR (COMIC) WALLPAPER!!!</h2>
     <a href="https://discord.gg/szk2bceM6f" class="news-card">
@@ -615,6 +400,18 @@
   </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
